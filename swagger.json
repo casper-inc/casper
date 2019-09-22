@@ -1,0 +1,1602 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "Casper",
+        "description": "Casper - Making company travel and accomodation easy and convenient."
+    },
+    "servers": [
+        {
+          "url": "http://localhost:3000/"
+        },
+        {
+          "url": "https://caspervoyager-staging.herokuapp.com/"
+        }
+      ],
+    "host": "",
+    "basePath": "/api",
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Standard Authorization header using the bearer scheme. Example: \"bearer {token}\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Endpoint for Authentication"
+        },
+        {
+            "name": "Users",
+            "description": "Endpoint for Users"
+        },
+        {
+            "name": "Facility",
+            "description": "Endpoint for CRUD operations involving Facilities"
+        },
+        {
+            "name": "Requests",
+            "description": "Endpoint for CRUD operations Trip Request"
+        },
+        {
+            "name": "Comment",
+            "description": "Endpoint for CRUD operations on Comment"
+        },
+        {
+            "name": "Notifications",
+            "description": "Endpoint for manipulating notifications"
+        }
+    ],
+    "paths": {
+        "/auth/signup/user": {
+            "post": {
+                "description": "Registers a User",
+                "summary": "Creates a new user on the system",
+                "tags": [
+                    "Auth"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing user information",
+                        "schema": {
+                            "$ref": "#/requestBody/userSignupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Account created successfully"
+                    },
+                    "400": {
+                        "description": "Please fill in the fields"
+                    },
+                    "409": {
+                        "description": "User with email already exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/signup/supplier": {
+            "post": {
+                "description": "Registers a Suppler",
+                "summary": "Creates a new supplier company and add the admin user to the database",
+                "tags": [
+                    "Auth"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing supplier information",
+                        "schema": {
+                            "$ref": "#/requestBody/supplierSignupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Supplier created successfully"
+                    },
+                    "400": {
+                        "description": "Please fill in the fields"
+                    },
+                    "409": {
+                        "description": "User with email already exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/verify": {
+            "get": {
+              "description": "The endpoint verifies a new user's verification link and marks the user account as verified if successful",
+              "summary": "Marks User account as verified",
+              "tags": [
+                "Auth"
+              ],
+              "parameters": [
+                {
+                  "name": "token",
+                  "in": "query",
+                  "schema": {
+                    "type": "string"
+                  },
+                  "example": "eyJhbGciOiJIUzI1NiJ9.Mg.hbsvkNj_kZvQYNtZxa4r2GXoNRLq1q4xC9qSq48Dwhw"
+                }
+              ],
+              "responses": {
+                "500": {
+                  "description": "Internal Server Error"
+                },
+                "400": {
+                  "description": "Invalid Token/User does not exist",
+                  "content": {
+                    "application/json; charset=utf-8": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "200": {
+                  "description": "Account verification success"
+                }
+              }
+            }
+          },
+          "/auth/signup/company": {
+            "post": {
+                "description": "Registers a Company",
+                "summary": "Creates a new company on the system",
+                "tags": [
+                    "Auth"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing a company signup information",
+                        "schema": {
+                            "$ref": "#/requestBody/companySignUpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Account created successfully"
+                    },
+                    "400": {
+                        "description": "Please fill in the fields"
+                    },
+                    "409": {
+                        "description": "User with email already exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "User should be logged in",
+                "summary": "Logs in an existing user",
+                "tags": [
+                    "Auth"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing user login information",
+                        "schema": {
+                            "$ref": "#/requestBody/loginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Invalid login details"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "get": {
+                "description": "Logout user",
+                "summary": "Logout user",
+                "tags": [
+                    "Auth"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "responses": {
+                    "200": {
+                        "description": "Logout successfully"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/profile/{userId}": {
+            "get": {
+                "description": "Populates user details on the profile",
+                "summary": "Gets a single user profile",
+                "tags": [
+                    "Users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "description": "The Id of the user"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    },
+                    "404": {
+                        "description": "User Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/profile/{userId}/": {
+            "put": {
+                "description": "Updates a single user profile",
+                "summary": "User can update the profile details",
+                "tags": [
+                    "Users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "description": "The Id of the user to be updated"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing user update",
+                        "schema": {
+                            "$ref": "#/requestBody/updateUserProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Authorization required"
+                    },
+                    "404": {
+                        "description": "User Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    },
+                    "schema": {
+                        "$ref": "#/requestBody/updateUserProfileRequest"
+                    }
+                }
+            }
+        },
+        "/users/requests": {
+            "get": {
+                "description": "Get all requests for a particular user",
+                "summary": "User can get their request history",
+                "tags": [
+                    "Users",
+                    "Requests"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Access denied"
+                    },
+                    "404": {
+                        "description": "You have not made any request yet"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/role": {
+            "patch": {
+                "description": "Updates User Role",
+                "summary": "Allows admin to Update User Role",
+                "tags": [
+                    "Users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing user role update",
+                        "schema": {
+                            "$ref": "#/requestBody/updateUserRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    },
+                    "404": {
+                        "description": "User Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "description": "Send a password reset email to the user",
+                "summary": "User can reset password",
+                "tags": [
+                    "Auth"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                      "in": "body",
+                      "name": "email",
+                      "required": true,
+                      "description": "The user email for password reset",
+                      "schema": {
+                        "$ref": "#/requestBody/resetPasswordRequest"
+                      }
+                    }
+                  ],
+                "responses": {
+                    "200": {
+                        "description": "Check your email for password reset link"
+                    },
+                    "400": {
+                      "description": "Email is required || Email must be valid"
+                    },
+                    "404": {
+                        "description": "User with email does not exist"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/facility/supplier": {
+            "post": {
+                "description": "Supplier - Create new facility",
+                "summary": "Enables a supplier to create a new facility record",
+                "tags": [
+                    "Facility"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                 "security": {
+                    "Bearer": []
+                },
+                "parameters": [
+                    {
+                      "in": "body",
+                      "name": "body",
+                      "required": true,
+                      "description": "The facility object",
+                      "schema": {
+                        "$ref": "#/requestBody/facility"
+                      }
+                    }
+                  ], 
+                   "responses": {
+                    "201": {
+                        "description": "Success"
+                    },
+                    "400": {
+                      "description": "Validation Error"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/facility/company": {
+            "post": {
+                "description": "creates a new facility for a specific company",
+                "summary": "Enables a company's Travel Admin to create a new facility",
+                "tags": [
+                    "Facility"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                      "in": "body",
+                      "name": "body",
+                      "required": true,
+                      "description": "This is the request body object containing a the details of the facility created",
+                      "schema": {
+                        "$ref": "#/requestBody/companyFacilityCreationRequest"
+                      }
+                    }
+                  ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created new facility"
+                    },
+                    "400": {
+                      "description": "Invalid input parameters"
+                    },
+                    "401": {
+                        "description": "Unautheticated Request (You are not logged in)"
+                    },
+                    "403": {
+                        "description": "Unauthorized Request (You don't have the require permission)"
+                    },
+                    "500": {
+                        "description":"Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/facility/supplier/{facilityId}/{roomId}":{
+            "patch" : {
+                "description": "updates room category availability",
+                "summary": "Enables a suppliers admin to update room availability",
+                "tags": [
+                    "Facility"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "facilityId",
+                        "required": true,
+                        "description": "TThe id of facility to be updated"
+                    },
+                    {
+                        "in": "path",
+                        "name": "roomId",
+                        "required": true,
+                        "description": "The Id of the room category to be updated"
+                    },
+                    {
+                      "in": "body",
+                      "name": "body",
+                      "required": true,
+                      "description": "This is the request body object containing the room availability status",
+                      "schema": {
+                        "$ref": "#/requestBody/updateFacilityroomCategory"
+                      }
+                    }
+                  ],
+                  "responses": {
+                    "201": {
+                        "description": "Success"
+                    },
+                    "401": {
+                      "description": "Client Error",
+                      "schema": {
+                        "$ref": "#/requestBody/401"
+                      }
+                    },
+                    "403": {
+                        "description": "Client Error",
+                        "schema": {
+                            "$ref": "#/requestBody/403"
+                          }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "$ref": "#/requestBody/500"
+                          }
+                    }
+                }
+            }
+        },
+        "/facility/supplier/{facilityId}/": {
+            "patch" : {
+                "description": "updates facility amenities",
+                "summary": "Enables a suppliers admin to update amenities",
+                "tags": [
+                    "Facility"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "facilityId",
+                        "required": true,
+                        "description": "The Id of the facility to be updated"
+                    },
+                    {
+                      "in": "body",
+                      "name": "body",
+                      "required": true,
+                      "description": "This is the request body object containing the room amenities",
+                      "schema": {
+                        "$ref": "#/requestBody/updateFacilityamenities"
+                      }
+                    }
+                  ],
+                  "responses": {
+                    "201": {
+                        "description": "Success"
+                    },
+                    "401": {
+                      "description": "Client Error",
+                      "schema": {
+                        "$ref": "#/requestBody/401"
+                      }
+                    },
+                    "403": {
+                        "description": "Client Error",
+                        "schema": {
+                            "$ref": "#/requestBody/403"
+                          }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "schema": {
+                            "$ref": "#/requestBody/500"
+                          }
+                    }
+                }
+            }
+        },
+        "/trip/request": {
+            "post": {
+                "description": "Creates a one-way trip request",
+                "summary": "Allows user to create a one-way trip request",
+                "tags": [
+                    "Requests"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing trip request",
+                        "schema": {
+                            "$ref": "#/requestBody/tripRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "one-way trip request created successfully"
+                    },
+                    "400": {
+                        "description": "Please fill in the fields"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/notification/status/seen": {
+            "patch": {
+                "description": "Endpoint for marking all unseen notifications as seen for a particular user",
+                "summary": "Enables a logged in user to mark all his/her unseen notifications as seen",
+                "tags": [
+                    "Notifications"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing trip request",
+                        "schema": {
+                            "$ref": "#/requestBody/tripRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "one-way trip request created successfully"
+                    },
+                    "400": {
+                        "description": "Please fill in the fields"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/booking/accommodation": {
+            "post": {
+                "description": "Endpoint for booking accommodations",
+                "summary": "Enables a user book an accommodation in a suppliers' facility",
+                "tags": [
+                    "Booking"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                      "in": "body",
+                      "name": "booking",
+                      "required": true,
+                      "description": "The booking object",
+                      "schema": {
+                        "$ref": "#/requestBody/accommodationBooking"
+                      }
+                    }
+                  ],
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/requestBody/accBookingSuccess"
+                          }
+                    },
+                    "400": {
+                      "description": "Client error",
+                      "schema": {
+                        "$ref": "#/requestBody/400"
+                      }
+                    },
+                    "401": {
+                        "description": "Client error",
+                        "schema": {
+                          "$ref": "#/requestBody/401"
+                        }
+                      },
+                      "404": {
+                        "description": "Client error",
+                        "schema": {
+                          "$ref": "#/requestBody/404"
+                        }
+                      },
+                      "500": {
+                        "description": "Server error",
+                        "schema": {
+                          "$ref": "#/requestBody/500"
+                        }
+                      }
+                }
+            }
+        },
+        "/comment": {
+            "post": {
+                "description": "Endpoint for creating a comment",
+                "summary": "Enables a user to add a comment to a travel request",
+                "tags": [
+                    "Comment"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                      "in": "body",
+                      "name": "comment",
+                      "required": true,
+                      "description": "The comment object",
+                      "schema": {
+                        "$ref": "#/requestBody/commentRequest"
+                      }
+                    }
+                  ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created comment"
+                    },
+                    "400": {
+                      "description": "Invalid input parameters"
+                    },
+                    "401": {
+                        "description": "Unauthenticated Request"
+                      },
+                      "403": {
+                        "description": "Unauthorized Request"
+                      },
+                      "404": {
+                        "description": "Non-existent record"
+                      },
+                      "500": {
+                        "description": "Internal Server error"
+                      }
+                }
+            }
+        },
+        "/comment/{commentId}":{
+            "delete" : {
+                "description": "Deletes a comment from a comment thread",
+                "summary": "Enables a user to delete his/her comment on a travel request",
+                "tags": [
+                    "Comment"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "commentId",
+                        "required": true,
+                        "description": "The ID of the comment you want to delete"
+                    }
+                  ],
+                  "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/requestBody/commentDeleteSuccess"
+                          }
+                    },
+                    "401": {
+                      "description": "Unauthenticated Request",
+                      "schema": {
+                        "$ref": "#/requestBody/401"
+                      }
+                    },
+                    "403": {
+                        "description": "Unauthorized Request",
+                        "schema": {
+                            "$ref": "#/requestBody/403"
+                          }
+                    },
+                    "404": {
+                        "description": "Non-existent record",
+                        "schema": {
+                            "$ref": "#/requestBody/404"
+                          }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/requestBody/500"
+                          }
+                    }
+                }
+            }
+        }
+    }
+    ,
+        "requestBody": {
+            "userSignupRequest": {
+                "title": "User Signup Request",
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "description": "First name of the user",
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "description": "Last name of the user",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email of the user",
+                        "type": "string"
+                    },
+                    "password": {
+                        "description": "The Password of the user",
+                        "type": "string"
+                    },
+                    "birthdate": {
+                        "description": "The date of birth of user",
+                        "type": "date"
+                    },
+                    "companyName": {
+                        "description": "The user's company name",
+                        "type": "string"
+                    },
+                    "preferredCurrency": {
+                        "description": "The user's currency preference",
+                        "type": "string"
+                    },
+                    "street": {
+                        "description": "The user's street address",
+                        "type": "string"
+                    },
+                    "city": {
+                        "description": "The user's city address",
+                        "type": "string"
+                    },
+                    "state": {
+                        "description": "The user's state address",
+                        "type": "string"
+                    },
+                    "country": {
+                        "description": "The user's country address",
+                        "type": "string"
+                    },
+                    "zip": {
+                        "description": "The user's zip code",
+                        "type": "string"
+                    },
+                    "phoneNumber": {
+                        "description": "The user's phone number",
+                        "type": "string"
+                    },
+                    "role": {
+                        "description": "The user's role",
+                        "type": "string"
+                    },
+                    "department": {
+                        "description": "The user's department",
+                        "type": "string"
+                    }
+
+                },
+                "example": {
+                    "firstName": "King",
+                    "lastName": "David",
+                    "email": "caspervoyager9@gmail.com",
+                    "country": "Nigeria",
+                    "companyName": "casper",
+                    "password": "Elija455h",
+                    "gender": "male",
+                    "street": "20, Board Street",
+                    "city": "ikeja",
+                    "state": "Lagos",
+                    "birthdate": "2010-01-01",
+                    "phoneNumber": "08063345598",
+                    "signupToken": "supplier.1.5861@4680"
+                  },
+                "required": [
+                    "firstName, lastName, email, password"
+                ]
+            },
+            "supplierSignupRequest": {
+                "title": "User Signup Request",
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "description": "First name of the Admin",
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "description": "Last name of the Admin",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email of the Admin",
+                        "type": "string"
+                    },
+                    "password": {
+                        "description": "The Password of the Admin",
+                        "type": "string"
+                    },
+                    "companyAddress": {
+                        "description": "The supplier's company address",
+                        "type": "string"
+                    },
+                    "companyName": {
+                        "description": "The supplier's company name",
+                        "type": "string"
+                    },
+                    "categoryOfServiceId": {
+                        "description": "The supplier's category of service",
+                        "type": "integer"
+                    },
+                    "phoneNumber": {
+                        "description": "The Admin's phone number",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "firstName": "King",
+                    "lastName": "David",
+                    "email": "caspervoyager9@gmail.com",
+                    "companyName": "casper",
+                    "companyAddress": "No 1, clinton str, Lagos, Nigeria",
+                    "categoryOfServiceId": 2,
+                    "password": "Elija455h",
+                    "phoneNumber": "08063345598"
+                  },
+                "required": [
+                    "firstName", "lastName", "email", "companyName", "companyAddress", "categoryOfService", "password"
+                ]
+            },
+            "tripRequest": {
+                "title": "One-way Trip Request",
+                "type": "object",
+                "properties": {
+                    "tripType": {
+                        "description": "Type of trip request",
+                        "type": "string"
+                    },
+                    "purpose": {
+                        "description": "Purpose of trip request",
+                        "type": "string"
+                    },
+                    "origin": {
+                        "description": "Origin of trip request",
+                        "type": "string"
+                    },
+                    "destination": {
+                        "description": "destination of trip request",
+                        "type": "string"
+                    },
+                    "departureDate": {
+                        "description": "departureDate of trip request",
+                        "type": "string"
+                    },
+                    "managerId": {
+                        "description": "The id of the line manager that would process the trip request",
+                        "type": "number"
+                    }
+                },
+                "example": {
+                    "tripType": "One-way",
+                    "purpose": "official",
+                    "origin": "Abuja",
+                    "destination": "Lagos",
+                    "departureDate": "2019-11-07",
+                    "managerId": 2
+                  },
+                "required": [
+                    "tripType, purpose, origin, destination, departureDate, managerId"
+                ]
+            },
+            "companySignUpRequest": {
+                "title": "Company Signup Request",
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "description": "first name of the Company Admin",
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "description": "Last name of the Company Admin",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email of the user",
+                        "type": "string"
+                    },
+                    "password": {
+                        "description": "The Password of the user",
+                        "type": "string"
+                    },
+                    "companyName": {
+                        "description": "The user's company name",
+                        "type": "string"
+                    },
+                    "companyAddress": {
+                        "description": "The company's Address",
+                        "type": "string"
+                    },
+                    "companySizeId": {
+                        "description": "The company's Size, between 1-101 and Above,a id reference is passed to the server",
+                        "type": "integer"
+                    },
+                    "companyPlanId": {
+                        "description": "The plan to subscribe, gold,silver or platinum ,a id reference is passed to the server",
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "firstName": "Ayodelre",
+                    "lastName": "Akin",
+                    "companySizeId": 1,
+                    "companyPlanId": 2,
+                    "email": "daylay33@gmail.com",
+                    "companyAddress": "30, Ania Street",
+                    "companyName": "casper",
+                    "password": "Elijah38490"
+                },
+                "required": [
+                    "firstName, lastName, email,password,companySizeId,companyPlanId,companyAddress,companyName"
+                ]
+            },
+            "companyFacilityCreationRequest": {
+                "title": "New company facility creation Request",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "Name of Facility",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "A simple description of the facility",
+                        "type": "string"
+                    },
+                    "state": {
+                        "description": "The state where the facility is located",
+                        "type": "string"
+                    },
+                    "city": {
+                        "description": "The city where the facility is located",
+                        "type": "string"
+                    },
+                    "address": {
+                        "description": "An address excluding state and city where the facility is located",
+                        "type": "string"
+                    },
+                    "rooms": {
+                        "description": "A collection of room types available in the facility, Checkout the example for clarity",
+                        "type": "array"
+                    },
+                    "amenities": {
+                        "description": "A collection of amenities available in the facility. Usually provided as a list of checkbox. Refer to the example for clarity on value type",
+                        "type": "array"
+                    },
+                    "addOns": {
+                        "description": "A collection of extra/add-on services available in the facility. Usually provided as a list of checkbox. Refer to the example for clarity on value type",
+                        "type": "array"
+                    },
+                    "imageUrl": {
+                        "description": "A link to a picture of the facility",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "amenities": [
+                        1,5,5,6,7,8
+                        ],
+                    "rooms": [{
+                        "occupancyCount": 2,
+                        "roomCategoryId": 1,
+                        "description": "A room for a single dude",
+                        "roomCount": 3
+                    },
+                    {
+                        "occupancyCount": 3,
+                        "roomCategoryId": 2,
+                        "description": "A room for two dudes",
+                        "roomCount": 3
+                    }],
+                    "description": "A nice place to stay for all your ever",
+                    "addOns":["parking lot", "free-wifi"],
+                    "state": "Ondo",
+                    "city": "Akure",
+                    "address": "30, Ojumu Crescent",
+                    "name": "Bliss World",
+                    "imageUrl": "http://www.google.com"
+                }
+                ,
+                "required": [
+                    "name, state, city,address,description,imageUrl,rooms,amenities,addOns"
+                ]
+            },
+            "updateFacilityroomCategory": {
+                "title": "Update room category",
+                "type": "object",
+                "properties": {
+                    "roomStatus": {
+                        "description": "status of room category",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "roomStatus": "unavailable"
+                },
+                "required": [
+                    "roomStatus"
+                ]
+            },
+            "updateFacilityamenities": {
+                "title": "Update amenities of a facility",
+                "type": "object",
+                "properties": {
+                    "amenities": {
+                        "description": "ids of amenities to be updated",
+                        "type": "array"
+                    }
+                },
+                "example": {
+                    "amenities": [4, 5, 1]
+                },
+                "required": [
+                    "amenities"
+                ]
+            },
+            "loginRequest": {
+                "title": "Login Request",
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "description": "Email address of the user",
+                        "type": "string"
+                    },
+                    "password": {
+                        "description": "The Password of the user",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "email": "caspervoyager9@gmail.com",
+                    "password": "Elija455h"
+                },
+                "required": [
+                    "email, password,"
+                ]
+            },
+            "updateUserProfileRequest": {
+                "title": "Update User",
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "description": "First name of the user",
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "description": "Last name of the user",
+                        "type": "string"
+                    },
+                    "email": {
+                        "description": "Email of the user",
+                        "type": "string"
+                    },
+                    "gender": {
+                        "description": "Use gender",
+                        "type": "integer"
+                    },
+                    "department": {
+                        "description": "User department",
+                        "type": "string"
+                    },
+                    "lineManager": {
+                        "description": "User line manager",
+                        "type": "string"
+                    },
+                    "street": {
+                        "description": "User street",
+                        "type": "string"
+                    },
+                    "preferredLanguage": {
+                        "description": "User preferred language",
+                        "type": "string"
+                    },
+                    "preferredCurrency": {
+                        "description": "User preferred currency",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "firstName": "first name",
+                    "lastName": "last name",
+                    "email": "newemail@example.com",
+                    "gender": "male",
+                    "department": "",
+                    "lineManager": "",
+                    "street": "street",
+                    "preferredLanguage": "EN",
+                    "preferredCurrency": "Naira"
+                }
+            },
+            "updateUserRoleRequest": {
+                "title": "Update User Role",
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "description": "the email of the user",
+                        "type": "string"
+                    },
+                    "roleId": {
+                        "description": "Id of role for the user",
+                        "type": "number"
+                    }
+                },
+                "example": {
+                    "email": "caspervoyager9@gmail.com",
+                    "roleId": 5
+                }
+            },
+            "resetPasswordRequest": {
+                "title": "Password Reset Request",
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "description": "Email address of the user user",
+                    "type": "string"
+                  }
+                },
+                "example": {
+                    "email": "johndoe@example.com"
+                }
+              },
+              "facility": {
+                "title": "Company Signup Request",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "Facility name",
+                        "type": "string"
+                    },
+                    "city": {
+                        "description": "City in which Facility is located",
+                        "type": "string"
+                    },
+                    "state": {
+                        "description": "State in which Facility is located",
+                        "type": "string"
+                    },
+                    "address": {
+                        "description": "Facility address",
+                        "type": "string"
+                    },
+                    "imageUrl": {
+                        "description": "Facility Image Url",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Facility description",
+                        "type": "string"
+                    },
+                    "rooms": {
+                        "description": "an array of available rooms on the facility",
+                        "type": "array"
+                    },
+                    "amenities": {
+                        "description": "An array of the ids of amenities on the facility",
+                        "type": "array"
+                    },
+                    "addOns": {
+                        "description": "An array of add on service offered by the facility management",
+                        "type": "array"
+                    }
+                },
+                "example": {
+                    "name": "Sheraton Hotels",
+                    "state": "Lagos",
+                    "city": "Ajah",
+                    "address": "123, St. Micheal str Ajah, Lagos state",
+                    "imageUrl": "https://cloudinary/sheraton-lagos",
+                    "description": "Hotels and suite",
+                    "rooms": [{
+                        "roomCount": 3,
+                        "roomCategoryId": 4,
+                        "occupancyCount":2,
+                        "roomCost":5000
+                    },
+                    {
+                        "roomCount": 2,
+                        "roomCategoryId": 2,
+                        "occupancyCount":1,
+                        "roomCost":15000
+                    }],
+                    "amenities": [1,2,3,4],
+                    "addOns": ["wifi","coffee shop"]
+                }
+              },
+              "commentRequest": {
+                  "title": "Comment",
+                  "type": "object",
+                  "properties": {
+                    "requestId": {
+                        "description": "The id of the travel request",
+                        "type": "number"
+                    },
+                    "message": {
+                         "description":  "The body of a comment",
+                        "type": "date"
+                    }
+                  },
+                  "example": {
+                    "requestId": 1,
+                    "message": "What's happening with your trip ?"
+                }
+              },
+              "accommodationBooking": {
+                "title": "Accommodation Booking",
+                "type": "object",
+                "properties": {
+                    "checkIn": {
+                        "description": "The date user wants to check-in",
+                        "type": "date"
+                    },
+                    "checkOut": {
+                        "description": "The date user wants to check-out",
+                        "type": "date"
+                    },
+                    "roomId": {
+                        "description": "The id of the room user wants to book",
+                        "type": "integer"
+                    },
+                    "userId": {
+                        "description": "The id of the user that wants to book accommodation",
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "checkIn": "2019-09-20",
+                    "checkOut": "2019-09-21",
+                    "roomId": 1,
+                    "userId": 1
+                }
+              },
+              "accBookingSuccess": {
+                  "properties": {
+                      "status": {
+                          "description": "Success message returned after a successful booking",
+                          "type": "string"
+                      },
+                      "data": {
+                          "description": "A booking object returned by the server",
+                          "type": "object"
+                      }
+                  },
+                  "example": {
+                    "status": "success",
+                    "data": {
+                        "id": 1,
+                        "checkIn": "2019-09-20",
+                        "checkOut": "2019-09-21",
+                        "roomId": 1,
+                        "userId": 1,
+                        "updatedAt": "2019-09-09T14:22:21.170Z",
+                        "createdAt": "2019-09-09T14:22:21.170Z"
+                    }
+                }
+              },
+              "commentDeleteSuccess": {
+                  "properties":{
+                    "status" : {
+                        "description":"A success text that indicates the comment has been deleted",
+                        "type": "string"
+                    },
+                    "data": {
+                        "description": "An object that only contains an id property whose value is the id of the deleted comment",
+                        "type": "object"
+                    }
+                  },
+                  "example": {
+                      "status": "success",
+                      "data":{
+                          "id": 2
+                      }
+                  }
+              },
+              "notificationSuccess": {
+                "properties": {
+                    "status": {
+                        "description": "Success message",
+                        "type": "string"
+                    },
+                    "data": {
+                        "description": "An array of updated notifications",
+                        "type": "array"
+                    }
+                },
+                "example": {
+                    "status": "success",
+                    "data": [
+                      {
+                        "id": 8,
+                        "userId": 18,
+                        "message": "Kingsley arinze just registed with your company token",
+                        "url": "https://app.casper.com/kingleyArinze",
+                        "status": "seen",
+                        "createdAt": "2019-09-15T10:15:24.924Z",
+                        "updatedAt": "2019-09-15T10:15:28.183Z"
+                      },
+                      {
+                        "id": 9,
+                        "userId": 18,
+                        "message": "Kingsley arinze just registed with your company token",
+                        "url": "https://app.casper.com/kingleyArinze",
+                        "status": "seen",
+                        "createdAt": "2019-09-15T10:15:25.792Z",
+                        "updatedAt": "2019-09-15T10:15:28.183Z"
+                      }
+                    ]
+                }
+            },
+              "400": {
+                "properties": {
+                    "status": {
+                        "description": "Client error",
+                        "type":"string"
+                    },
+                    "error": {
+                        "description": "A descriptive error message",
+                        "type": "object"
+                    }
+                },
+                "example": {
+                    "status": "fail",
+                    "error": {
+                        "message": "There was a validation error"
+                    }
+                }
+            },
+            "401": {
+                "properties": {
+                    "status": {
+                        "description": "Authentication error",
+                        "type":"string"
+                    },
+                    "error": {
+                        "description": "A descriptive error message",
+                        "type": "object"
+                    }
+                },
+                "example": {
+                    "status": "fail",
+                    "error": {
+                        "message": "Token is required"
+                    }
+                }
+            },
+            "403": {
+                "properties": {
+                    "status": {
+                        "description": "Usually just the text fail",
+                        "type":"string"
+                    },
+                    "error": {
+                        "description": "A descriptive error message",
+                        "type": "object"
+                    }
+                },
+                "example": {
+                    "status": "fail",
+                    "error": {
+                        "message": "User is unauthorized"
+                    }
+                }
+            },
+            "404": {
+                "properties": {
+                    "status": {
+                        "description": "Authentication error",
+                        "type":"string"
+                    },
+                    "error": {
+                        "description": "A descriptive error message",
+                        "type": "object"
+                    }
+                },
+                "example": {
+                    "status": "fail",
+                    "error": {
+                        "message": "Data supplied by the user was not found"
+                    }
+                }
+            },
+            "500": {
+                "properties": {
+                    "status": {
+                        "description": "Server error",
+                        "type":"string"
+                    },
+                    "error": {
+                        "description": "A descriptive error message",
+                        "type": "object"
+                    }
+                },
+                "example": {
+                    "status": "fail",
+                    "error": {
+                        "message": "A server error prevented your request from being processed"
+                    }
+                }
+            }
+        }
+    }
+    
