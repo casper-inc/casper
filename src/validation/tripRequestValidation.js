@@ -148,6 +148,32 @@ export default class TripRequestValidation {
   }
 
   /**
+  * Validates Trip stats Request paramenters
+  *
+  * @param {object} body - The request object
+  * @param {object} res - The request response object
+  * @returns {object} - returns an object (error or response).
+  */
+  static statsRequest(body) {
+    const schema = {
+      startDate: Joi.date()
+        .format('YYYY-MM-DD')
+        .required()
+        .error(TripRequestValidation.validateTripStats('startDate')),
+      endDate: Joi.date()
+        .format('YYYY-MM-DD')
+        .min(body.startDate)
+        .required()
+        .error(TripRequestValidation.validateTripStats('endDate'))
+    };
+    const { error } = Joi.validate({ ...body }, schema);
+    if (error) {
+      throw new ApiError(400, error.details[0].message);
+    }
+    return true;
+  }
+
+  /**
    * Validates departureDate and returnDate keys
    * @param {string} key - The key to validate
    * @returns {Error} Returns a descriptive error message
@@ -167,6 +193,35 @@ export default class TripRequestValidation {
             break;
           case 'date.min':
             err.message = `${key} must be larger than or equal to ${key === 'departureDate' ? 'today' : 'departureDate'}`;
+            break;
+          default:
+            break;
+        }
+      });
+      return errors;
+    };
+  }
+
+  /**
+   * Validates trip request stats keys
+   * @param {string} key - The key to validate
+   * @returns {Error} Returns a descriptive error message
+   */
+  static validateTripStats(key) {
+    return (errors) => {
+      errors.forEach((err) => {
+        switch (err.type) {
+          case 'any.required':
+            err.message = `${key} is required!`;
+            break;
+          case 'date.format':
+            err.message = `${key} should be in this format ${err.context.format}`;
+            break;
+          case 'date.base':
+            err.message = `${key} should not be empty`;
+            break;
+          case 'date.min':
+            err.message = `${key} must be larger than or equal to ${key === 'startDate' ? 'today' : 'startDate'}`;
             break;
           default:
             break;
