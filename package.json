@@ -7,7 +7,7 @@
     "test": "cross-env NODE_ENV=test nyc --reporter=text --reporter=html mocha src/test/*.*.js --timeout 10000 -c --require @babel/register --exit",
     "seed": "sequelize db:seed:all",
     "unseed": "sequelize db:seed:undo",
-    "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "migrate:reset": "sequelize db:migrate:undo:all",
     "migrate": "sequelize db:migrate",
     "start:dev": "npm run migrate && npm run seed && nodemon --exec babel-node ./src/index.js",
