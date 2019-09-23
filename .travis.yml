@@ -10,8 +10,9 @@ before_script:
   - psql -c 'create database casper_test;' -U postgres
 script:
   - npm i -g sequelize-cli
-  - npm install
+  - npm ci
   - npm test
-  - npm run coveralls
+after_success:
+  - npm run coverage
 notifications:
   email: false

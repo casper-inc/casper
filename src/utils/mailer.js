@@ -32,7 +32,7 @@ class Mailer {
     const mail = {
       to: email,
       from: ADMIN_EMAIL,
-      templateId: 'd-a1922b184048430088fd7d0bf446cd06',
+      templateId: 'd-598aa2e6e00b4c938278c24eeb62cc17',
       dynamic_template_data: {
         name: firstName,
         'verification-link': verificationLink
@@ -68,7 +68,7 @@ class Mailer {
     const mail = {
       to: email,
       from: ADMIN_EMAIL,
-      templateId: 'd-e43cfadaf90a4fa6aa2b3ba8c6a2889b',
+      templateId: 'd-0e0b3c582ec04e7fb6cff2bd12b9b0ba',
       dynamic_template_data: {
         name: firstName,
         'verification-link': verificationLink,
@@ -98,7 +98,7 @@ class Mailer {
     const mail = {
       to: email,
       from: ADMIN_EMAIL,
-      templateId: 'd-dd8d3babd4b842b28e3ebf03cfdc4c90',
+      templateId: 'd-a47cbbf0e90e469b92dc5329a0659b32',
       dynamic_template_data: {
         firstName,
         resetPasswordLink

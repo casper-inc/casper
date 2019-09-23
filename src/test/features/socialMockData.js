@@ -11,7 +11,7 @@ const googleMock = (req, res, next) => {
       familyName: 'voyager',
       givenName: 'Casper'
     },
-    emails: [{ value: 'casper.caspervoyager9@gmail.com', verified: true }],
+    emails: [{ value: 'caspervoyager9@gmail.com', verified: true }],
     photos: [
       {
         value:

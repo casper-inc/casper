@@ -318,7 +318,7 @@ describe('GET /api/auth/verify?token', () => {
     });
   });
 
-  it('should sign in user if emaill is true', async () => {
+  it('should sign in user if email is true', async () => {
     const response = await chai.request(server)
       .get('/api/auth/rightSocial');
     expect(response).to.have.status(200);
