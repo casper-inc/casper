@@ -1,5 +1,5 @@
 [![Reviewed by Hound](https://img.shields.io/badge/ESLint%20Reviewed%20by%20-HoundCI-d16ef5)](https://houndci.com)
-`TRAVIS BADGE` `COVERAGE BADGE`
+[![Build Status](https://travis-ci.org/casper-inc/casper-backend.svg?branch=develop)](https://travis-ci.org/casper-inc/casper-backend) [![Coverage Status](https://coveralls.io/repos/github/casper-inc/casper-backend/badge.svg?branch=develop)](https://coveralls.io/github/casper-inc/casper-backend?branch=develop)
 ___
 
 Casper - Making company travel and accomodation easy and convinient.

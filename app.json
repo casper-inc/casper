@@ -17,6 +17,30 @@
     },
     "SECRET": {
       "required": true
+    },
+    "SENDGRID_KEY": {
+      "required": true
+    },
+    "ADMIN_EMAIL":{
+      "required": true
+    },
+    "FACEBOOK_CLIENT_ID":{
+      "required": true
+    },
+    "FACEBOOK_CLIENT_SECRET":{
+      "required": true
+    },
+    "FACEBOOK_CALLBACK": {
+      "required": true
+    },
+    "GOOGLE_CLIENT_ID":{
+      "required": true
+    },
+    "GOOGLE_CLIENT_SECRET":{
+      "required": true
+    },
+    "GOOGLE_CALLBACK": {
+      "required": true
     }
   },
   "formation": {},
