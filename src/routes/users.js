@@ -22,8 +22,8 @@ const { onUpdateProfile } = UserMiddleware;
 const { onRequestStatus, isUsersOwnIsStatus } = RequestMiddleware;
 const { tripStatsCheck } = TripRequestMiddleware;
 
-router.get('/profile/:userId', authenticate, isAuthenticated, userProfile);
-router.put('/profile/:userId', authenticate, isAuthenticated, onUpdateProfile, updateProfile);
+router.get('/:userId', authenticate, isAuthenticated, userProfile);
+router.put('/:userId', authenticate, isAuthenticated, onUpdateProfile, updateProfile);
 
 router.get('/requests', authenticate, getUserRequests);
 router.get('/requests/:statusId', authenticate, verifyRoles(companyAdminManager), onRequestStatus, getRequest);// get request by userId in the token and specifying status in param

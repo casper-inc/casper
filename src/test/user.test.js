@@ -37,16 +37,16 @@ describe('User Route Endpoints', () => {
 describe('GET REQUESTS', () => {
   it('should successfully populate the user data on the profile with a status of 200', async () => {
     const { id } = newlyCreatedUser;
-    const response = await chai.request(server).get(`/api/users/profile/${id}`)
-      .set('authorization', `Bearer ${token}`);
+    const response = await chai.request(server).get(`/api/users/${id}`)
+      .set('Cookie', `token=${token}`);
     const { body: { status } } = response;
     expect(response).to.have.status(200);
     expect(status).to.equal('success');
   });
   it('should return error of 401, access denied', async () => {
     const id = 2131121313;
-    const response = await chai.request(server).get(`/api/users/profile/${id}`)
-      .set('authorization', `Bearer ${token}`);
+    const response = await chai.request(server).get(`/api/users/${id}`)
+      .set('Cookie', `token=${token}`);
     const { body: { status } } = response;
     expect(response).to.have.status(401);
     expect(status).to.equal('fail');
@@ -55,8 +55,8 @@ describe('GET REQUESTS', () => {
 describe('PUT REQUESTS', () => {
   it('should return error of 401, access denied', async () => {
     const id = 2131121313;
-    const response = await chai.request(server).put(`/api/users/profile/${id}`)
-      .set('Cookie', `token=${token};`);
+    const response = await chai.request(server).put(`/api/users/${id}`)
+      .set('Cookie', `token=${token}`);
     const { body: { status } } = response;
     expect(response).to.have.status(401);
     expect(status).to.equal('fail');
@@ -74,8 +74,8 @@ describe('PUT REQUESTS', () => {
       birthdate: faker.date.past(),
       phoneNumber: faker.phone.phoneNumber(),
     };
-    const response = await chai.request(server).put(`/api/users/profile/${id}`).send(user)
-      .set('Cookie', `token=${token};`);
+    const response = await chai.request(server).put(`/api/users/${id}`).send(user)
+      .set('Cookie', `token=${token}`);
     const { body: { status } } = response;
     expect(response).to.have.status(200);
     expect(status).to.equal('success');
