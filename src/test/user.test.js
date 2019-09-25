@@ -92,7 +92,7 @@ describe('GET /users/requests', () => {
 describe('POST /users/request/stats', () => {
   it('should successfully return the number of trip request count', async () => {
     const queryObj = {
-      startDate: formatDate(Date.now()),
+      startDate: '2019-09-16',
       endDate: formatDate(Date.now())
     };
     const response = await chai.request(server)
@@ -102,6 +102,19 @@ describe('POST /users/request/stats', () => {
     expect(response).to.have.status(200);
     expect(status).to.equal('success');
     expect(data).to.be.a('number');
+  });
+  it('should return an error of 400 for endDate less than startDate', async () => {
+    const queryObj = {
+      startDate: '2019-09-16',
+      endDate: '2019-09-15'
+    };
+    const response = await chai.request(server)
+      .get(`/api/users/request/stats?start=${queryObj.startDate}&end=${queryObj.endDate}`)
+      .set('Cookie', `token=${token}`);
+    const { body: { status, error } } = response;
+    expect(response).to.have.status(400);
+    expect(status).to.equal('fail');
+    expect(error.message).to.be.a('string');
   });
   it('should return 400 error for invalid date input', async () => {
     const queryObj = {
