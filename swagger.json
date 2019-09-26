@@ -693,6 +693,57 @@
                 }
             }
         },
+        "/users/{userId}/notification": {
+            "patch": {
+                "description": "Updates a single manager email notification status",
+                "summary": "Managers can opt out or in for email notification",
+                "tags": [
+                    "Users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "required": true,
+                        "description": "The Id of the manager to be updated"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing user update",
+                        "schema": {
+                            "$ref": "#/requestBody/updateNotificationStatus"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Authorization required"
+                    },
+                    "404": {
+                        "description": "User Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    },
+                    "schema": {
+                        "$ref": "#/requestBody/updateNotificationStatus"
+                    }
+                }
+            }
+        },
         "/auth/reset-password": {
             "post": {
                 "description": "Send a password reset email to the user",
@@ -1542,6 +1593,19 @@
                 "required": [
                     "amenities"
                 ]
+            },
+            "updateNotificationStatus": {
+                "title": "Update Email Notification",
+                "type": "object",
+                "properties": {
+                    "emailNotify": {
+                        "description": "Notification Status",
+                        "type": "boolean"
+                    }
+                },
+                "example": {
+                    "emailNotify": false
+                }
             },
             "loginRequest": {
                 "title": "Login Request",

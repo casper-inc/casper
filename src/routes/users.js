@@ -11,7 +11,7 @@ const { verifyRoles } = RoleMiddleware;
 const { supplierAdmin, companyAdminManager } = Permissions;
 const { updateUserRole } = RoleController;
 const {
-  userProfile, updateProfile
+  getProfile, updateProfile, toggleEmailNotification
 } = UserController;
 const {
   getRequest, updateRequest, getUserRequests,
@@ -22,8 +22,9 @@ const { onUpdateProfile } = UserMiddleware;
 const { onRequestStatus, isUsersOwnIsStatus } = RequestMiddleware;
 const { tripStatsCheck } = TripRequestMiddleware;
 
-router.get('/profile/:userId', authenticate, isAuthenticated, userProfile);
+router.get('/profile/:userId', authenticate, isAuthenticated, getProfile);
 router.put('/profile/:userId', authenticate, isAuthenticated, onUpdateProfile, updateProfile);
+router.patch('/:userId/notification', authenticate, isAuthenticated, toggleEmailNotification);
 
 router.get('/requests', authenticate, getUserRequests);
 router.get('/requests/:statusId', authenticate, verifyRoles(companyAdminManager), onRequestStatus, getRequest);// get request by userId in the token and specifying status in param
