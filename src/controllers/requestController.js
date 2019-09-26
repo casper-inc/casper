@@ -3,7 +3,7 @@ import { Helpers, ApiError } from '../utils';
 
 const {
   getRequests, getRequest, updateAnyRequest,
-  getRequestByIdUserId, createTripRequest
+  getRequestByIdUserId, createTripRequest, searchByTime
 } = RequestService;
 
 const { successResponse, errorResponse } = Helpers;
@@ -36,13 +36,32 @@ export default class RequestController {
   }
 
   /**
-  *  creates a one way trip request
-  * @static
-  * @param {Request} req - The request from the endpoint.
-  * @param {Response} res - The response returned by the method.
-  * @returns { JSON } - A JSON object containing success or failure details.
-  * @memberof RequestController
-  */
+*  Gets trip request stats within a timeframe
+* @static
+* @param {Request} req - The request from the endpoint.
+* @param {Response} res - The response returned by the method.
+* @returns { JSON } - A JSON object containing success or failure details.
+* @memberof RequestController
+*/
+  static async getTripRequestsStats(req, res) {
+    try {
+      const { start: startDate, end: endDate } = req.query;
+      const { id } = req.data;
+      const result = await searchByTime(startDate, endDate, id);
+      return successResponse(res, result, 200);
+    } catch (err) {
+      errorResponse(res, { code: 500, message: err.message });
+    }
+  }
+
+  /**
+   *  creates a one way trip request
+   * @static
+   * @param {Request} req - The request from the endpoint.
+   * @param {Response} res - The response returned by the method.
+   * @returns { JSON } - A JSON object containing success or failure details.
+   * @memberof RequestController
+   */
   static async oneWayTripRequest(req, res) {
     try {
       const { body } = req;
