@@ -13,7 +13,7 @@ export const newSupplier = {
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
   email: faker.internet.email(),
-  companyName: 'Casper',
+  companyName: 'Andela',
   companyAddress: faker.address.secondaryAddress(),
   categoryOfServiceId: 2,
   password: faker.internet.password(15, false),
@@ -101,8 +101,18 @@ export const newCompanyUser = {
   companyName: 'Casper',
   password: 'Exunemployed01'
 };
+
+export const newTestCompany = {
+  email: 'kolajide@admin.com',
+  firstName: 'kola',
+  lastName: 'jidee',
+  password: 'tmobnvar..Ds66u',
+  companyName: faker.company.companyName(),
+  companyAddress: '235 ikorudu way',
+  companyPlanId: 1,
+  companySizeId: 2,
+};
 export const newRequest = {
-  requesterId: 12,
   purpose: 'Business Meeting',
   rememberMe: true,
   tripType: 'One-way',
@@ -116,7 +126,7 @@ export const tripRequest = {
   tripType: 'One-way',
   origin: 'Abuja',
   destination: 'Lagos',
-  departureDate: '2020-11-07'
+  departureDate: '2020-11-07',
 };
 
 export const commentData = {
