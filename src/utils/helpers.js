@@ -167,6 +167,8 @@ class Helpers {
       bithdate: user.birthdate,
       phoneNumber: user.phoneNumber,
       companyName: user.companyName,
+      passportName: user.passportName,
+      passportNumber: user.passportNumber,
       supplierId: user.supplierId,
       companyId: user.companyId,
       isVerified: user.isVerified,

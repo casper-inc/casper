@@ -22,10 +22,10 @@ const { onUpdateProfile } = UserMiddleware;
 const { onRequestStatus, isUsersOwnIsStatus } = RequestMiddleware;
 const { tripStatsCheck } = TripRequestMiddleware;
 
+router.get('/requests', authenticate, getUserRequests);
 router.get('/:userId', authenticate, isAuthenticated, userProfile);
 router.put('/:userId', authenticate, isAuthenticated, onUpdateProfile, updateProfile);
 
-router.get('/requests', authenticate, getUserRequests);
 router.get('/requests/:statusId', authenticate, verifyRoles(companyAdminManager), onRequestStatus, getRequest);// get request by userId in the token and specifying status in param
 router.patch('/requests/:requestId', authenticate, verifyRoles(companyAdminManager), onRequestStatus, updateRequest); // update requests by specifying request id in params
 router.get('/requests/:requestId/edit', authenticate, isUsersOwnIsStatus, onRequestStatus, getRequestByIdUserId);// get a single request by userId and requestId

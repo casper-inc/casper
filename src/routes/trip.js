@@ -8,6 +8,6 @@ const { oneWayTripRequest } = RequestController;
 const { onTripRequest, tripCheckUser, checkUserRecordExist } = TripRequestMiddleware;
 const { authenticate } = AuthMiddleware;
 
-router.post('/request', authenticate, onTripRequest, tripCheckUser, checkUserRecordExist, oneWayTripRequest);
+router.post('/request', authenticate, onTripRequest, checkUserRecordExist, oneWayTripRequest);
 
 export default router;
