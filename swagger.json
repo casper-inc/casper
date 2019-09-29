@@ -651,6 +651,61 @@
                 }
             }
         },
+        "/users/request/search?key={property}&value={parameter}": {
+            "get": {
+                "description": "Get all requests given a key value pair search",
+                "summary": "User can get requests when using a key, value pair ",
+                "tags": [
+                    "Users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "property",
+                        "required": true,
+                        "schema": {
+                            "type":"string",
+                            "format": "date",
+                            "default": "origin"
+                        },
+                        "description": "Request origin property"
+                    },
+                    {
+                        "in": "path",
+                        "name": "parameter",
+                        "required": true,
+                        "schema": {
+                            "type":"string",
+                            "format": "date",
+                            "default": "Lagos"
+                        },
+                        "description": "Request origin value"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Access denied, Token required"
+                    },
+                    "404": {
+                        "description": "No request matches your search"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users/role": {
             "patch": {
                 "description": "Updates User Role",
