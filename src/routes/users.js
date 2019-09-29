@@ -14,7 +14,7 @@ const {
   userProfile, updateProfile
 } = UserController;
 const {
-  getRequest, updateRequest, getUserRequests,
+  getRequest, searchRequests, updateRequest, getUserRequests,
   getRequestByIdUserId, updateUserRequest, getTripRequestsStats
 } = RequestController;
 const { isAuthenticated, authenticate } = AuthMiddleware;
@@ -26,6 +26,8 @@ router.get('/profile/:userId', authenticate, isAuthenticated, userProfile);
 router.put('/profile/:userId', authenticate, isAuthenticated, onUpdateProfile, updateProfile);
 
 router.get('/requests', authenticate, getUserRequests);
+// /requests/search?key=[]&value=[]
+router.get('/requests/search', authenticate, searchRequests);
 router.get('/requests/:statusId', authenticate, verifyRoles(companyAdminManager), onRequestStatus, getRequest);// get request by userId in the token and specifying status in param
 router.patch('/requests/:requestId', authenticate, verifyRoles(companyAdminManager), onRequestStatus, updateRequest); // update requests by specifying request id in params
 router.get('/requests/:requestId/edit', authenticate, isUsersOwnIsStatus, onRequestStatus, getRequestByIdUserId);// get a single request by userId and requestId

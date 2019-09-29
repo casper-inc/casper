@@ -2,7 +2,7 @@ import { RequestService } from '../services';
 import { Helpers, ApiError } from '../utils';
 
 const {
-  getRequests, getRequest, updateAnyRequest,
+  getRequests, getRequest, updateAnyRequest, searchByKey,
   getRequestByIdUserId, createTripRequest, searchByTime
 } = RequestService;
 
@@ -48,6 +48,24 @@ export default class RequestController {
       const { start: startDate, end: endDate } = req.query;
       const { id } = req.data;
       const result = await searchByTime(startDate, endDate, id);
+      return successResponse(res, result, 200);
+    } catch (err) {
+      errorResponse(res, { code: 500, message: err.message });
+    }
+  }
+
+  /**
+   * Gets request by search key
+   * @param {*} req - request
+   * @param {*} res - response
+   * @returns {JSON} - JSON object
+   * @memberof RequestController
+   */
+  static async searchRequests(req, res) {
+    try {
+      const { key, value } = req.query;
+      const { id } = req.data;
+      const result = await searchByKey(key, value, id);
       return successResponse(res, result, 200);
     } catch (err) {
       errorResponse(res, { code: 500, message: err.message });

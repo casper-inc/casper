@@ -253,6 +253,15 @@ describe('Request route endpoints', () => {
       expect(response).to.have.status(200);
       expect(response.body.status).to.equal('success');
     });
+
+    it('should get a trip that\'s been searched for', async () => {
+      const response = await chai
+        .request(server).get('/api/users/requests/search?key=origin&value=Lagos')
+        .set('Cookie', `token=${anotherUserToken}`);
+      expect(response).to.have.status(200);
+      expect(response.body.status).to.equal('success');
+
+    });
   });
 
   describe('Trip Request Endpoint', () => {
