@@ -146,6 +146,66 @@ describe('Facility route endpoints', () => {
       expect(response.body.error).to.be.a('object');
       expect(response.body.error).to.have.property('message');
     });
+    it('should return a 500 error response if something goes wrong while creating supplier facility', async () => {
+      const req = { data: { id: 9 } };
+      const mockResponse = () => {
+        const res = {};
+        res.status = sinon.stub().returns(res);
+        res.json = sinon.stub().returns(res);
+        return res;
+      };
+      const res = mockResponse();
+      const errorResponse = {
+        status: 'fail',
+        error: {
+          message: 'Failed to create facility. Try again',
+          errors: undefined
+        }
+      };
+      await FacilityController.addFacilitySupplier(req, res);
+      expect(res.status).to.have.been.calledWith(500);
+      expect(res.json).to.have.been.calledWith(errorResponse);
+    });
+    it('should return a 500 error response if something goes wrong while supplier updates facility amenties', async () => {
+      const req = { };
+      const mockResponse = () => {
+        const res = {};
+        res.status = sinon.stub().returns(res);
+        res.json = sinon.stub().returns(res);
+        return res;
+      };
+      const res = mockResponse();
+      const errorResponse = {
+        status: 'fail',
+        error: {
+          message: "Cannot read property 'amenities' of undefined",
+          errors: undefined
+        }
+      };
+      await FacilityController.amenitiesUpdate(req, res);
+      expect(res.status).to.have.been.calledWith(500);
+      expect(res.json).to.have.been.calledWith(errorResponse);
+    });
+    it('should return a 500 error response if something goes wrong while supplier updates rooms status', async () => {
+      const req = { };
+      const mockResponse = () => {
+        const res = {};
+        res.status = sinon.stub().returns(res);
+        res.json = sinon.stub().returns(res);
+        return res;
+      };
+      const res = mockResponse();
+      const errorResponse = {
+        status: 'fail',
+        error: {
+          message: "Cannot read property 'roomId' of undefined",
+          errors: undefined
+        }
+      };
+      await FacilityController.roomUpdate(req, res);
+      expect(res.status).to.have.been.calledWith(500);
+      expect(res.json).to.have.been.calledWith(errorResponse);
+    });
   });
   describe('POST /api/facility/company', () => {
     adminToken = null;

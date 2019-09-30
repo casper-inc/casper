@@ -24,7 +24,7 @@ export default class CommentController {
     try {
       const { data: { id }, body } = req;
       body.userId = id;
-      const comment = await createComment(body);
+      const comment = await createComment(req, body);
       successResponse(res, comment, 201);
     } catch (err) {
       errorResponse(res, {});

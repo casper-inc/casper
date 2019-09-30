@@ -77,7 +77,7 @@ describe('Request Endpoints', () => {
   it('MANAGER should get request by id in token and param status', async () => {
     const response = await chai
       .request(server)
-      .get(`/api/users/requests/${newlyCreatedRequest.statusId}`)
+      .get(`/api/users/requests/status/${newlyCreatedRequest.statusId}`)
       .set('Cookie', `token=${companyAdminToken}`);
     expect(response).to.have.status(200);
     expect(response.body.status).to.equal('success');
@@ -86,7 +86,7 @@ describe('Request Endpoints', () => {
   it('should throw error if wrong status param is passed', async () => {
     const response = await chai
       .request(server)
-      .get('/api/users/requests/5')
+      .get('/api/users/requests/status/5')
       .set('Cookie', `token=${companyAdminToken}`);
     expect(response).to.have.status(400);
     expect(response.body.error.message).to.equal('Request statusId can only be values 1, 2, 3 - approved, pending, rejected');
@@ -95,7 +95,7 @@ describe('Request Endpoints', () => {
   it('User should be able to get trip request for edit', async () => {
     const response = await chai
       .request(server)
-      .get(`/api/users/requests/${newlyCreatedRequest.id}/edit`)
+      .get(`/api/users/requests/${newlyCreatedRequest.id}`)
       .set('Cookie', `token=${userToken}`);
     expect(response).to.have.status(200);
     expect(response.body.status).to.equal('success');
@@ -104,7 +104,7 @@ describe('Request Endpoints', () => {
   it('should throw an error if user does not own the trip request', async () => {
     const response = await chai
       .request(server)
-      .get(`/api/users/requests/${newlyCreatedRequest.id}/edit`)
+      .get(`/api/users/requests/${newlyCreatedRequest.id}`)
       .set('Cookie', `token=${companyAdminToken}`);
     expect(response).to.have.status(401);
     expect(response.body.status).to.equal('fail');
@@ -114,7 +114,7 @@ describe('Request Endpoints', () => {
   it('should throw an error if trip request body contains statusId || requesterId', async () => {
     const response = await chai
       .request(server)
-      .put(`/api/users/requests/${newlyCreatedRequest.id}/update`)
+      .put(`/api/users/requests/${newlyCreatedRequest.id}`)
       .set('Cookie', `token=${userToken}`)
       .send({ statusId: 1, purpose: 'just official' });
     expect(response).to.have.status(401);
@@ -125,7 +125,7 @@ describe('Request Endpoints', () => {
   it('User should be able to update trip request', async () => {
     const response = await chai
       .request(server)
-      .put(`/api/users/requests/${newlyCreatedRequest.id}/update`)
+      .put(`/api/users/requests/${newlyCreatedRequest.id}`)
       .set('Cookie', `token=${userToken}`)
       .send({ purpose: 'just official', rememberMe: true, departureDate: '2019-12-09' });
     expect(response).to.have.status(200);
@@ -146,7 +146,7 @@ describe('Request Endpoints', () => {
   it('should throw an error for user if request is NOT PENDING', async () => {
     const response = await chai
       .request(server)
-      .get(`/api/users/requests/${newlyCreatedRequest.id}/edit`)
+      .get(`/api/users/requests/${newlyCreatedRequest.id}`)
       .set('Cookie', `token=${userToken}`);
     expect(response).to.have.status(400);
     expect(response.body.status).to.equal('fail');
@@ -190,7 +190,6 @@ describe('Request Endpoints', () => {
 
 describe('Request route endpoints', () => {
   let anotherUserToken;
-  let userId;
   let companyAdminResponse;
   let requester;
   let adminId;
@@ -218,7 +217,6 @@ describe('Request route endpoints', () => {
     };
     const companyUserResponse = await userSignup(reqUser, res);
     anotherUserToken = companyUserResponse.data.token;
-    userId = companyUserResponse.data.id;
     requester = companyUserResponse.data;
     adminId = admin.id;
   });

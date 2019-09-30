@@ -427,7 +427,7 @@
                 }
             }
         },
-        "/users/requests/{statusId}": {
+        "/users/requests/status/{statusId}": {
             "get": {
                 "description": "Manager Gets users requests by specifying status parameter. `Token is required`",
                 "summary": "Manager Gets all requests of such status",
@@ -460,6 +460,39 @@
             }
         },
         "/users/requests/{requestId}": {
+            "get": {
+                "description": "User Gets trip requests for editing by specifying requestId. `Token is required`",
+                "summary": "User Gets a single request for edit",
+                "tags": [
+                    "Requests"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [{
+                    "Bearer": []
+                }],
+                "parameters": [{
+                    "in": "path",
+                    "name": "requestId",
+                    "required": true,
+                    "description": "The requestId of the requests"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "This request is not pending"
+                    },
+                    "401": {
+                        "description": "You have no permission to edit this request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
             "patch": {
                 "description": "Updates a single request by assigned manager. `Token of Manager/Admins is required`",
                 "summary": "Manager can update the request status",
@@ -508,44 +541,7 @@
                         "$ref": "#/requestBody/updateRequestStatus"
                     }
                 }
-            }
-        },
-        "/users/requests/{requestId}/edit": {
-            "get": {
-                "description": "User Gets trip requests for editing by specifying requestId. `Token is required`",
-                "summary": "User Gets a single request for edit",
-                "tags": [
-                    "Requests"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "security": [{
-                    "Bearer": []
-                }],
-                "parameters": [{
-                    "in": "path",
-                    "name": "requestId",
-                    "required": true,
-                    "description": "The requestId of the requests"
-                }],
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    },
-                    "400": {
-                        "description": "This request is not pending"
-                    },
-                    "401": {
-                        "description": "You have no permission to edit this request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/users/requests/{requestId}/update": {
+            },
             "put": {
                 "description": "Updates a single request by assigned user. `Token of user is required`",
                 "summary": "user can update the request status",

@@ -1,4 +1,4 @@
-import { NotificationService } from '../services';
+import NotificationService from '../services/notificationService';
 
 const { create } = NotificationService;
 /**
