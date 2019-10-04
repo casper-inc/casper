@@ -2,7 +2,7 @@ import { TripRequestValidation } from '../validation';
 import { Helpers, ApiError } from '../utils';
 import { UserService } from '../services';
 
-const { errorResponse } = Helpers;
+const { errorResponse, tripTypeValidator } = Helpers;
 const { tripRequest, statsRequest } = TripRequestValidation;
 const { find } = UserService;
 
@@ -22,23 +22,22 @@ export default class TripRequestMiddleware {
       const validated = await tripRequest(req.body);
       const { email } = req.data;
       if (validated) {
-        const user = await find({ email });
-        const requesterObj = {
-          requesterFirstName: user.firstName,
-          requesterLastName: user.lastName,
-          requesterGender: user.gender,
-          requesterLineManager: user.lineManager,
-          requesterPassportNo: user.passportNo,
+        const {
+          id, firstName, lastName, gender, lineManager, passportNo,
+        } = await find({ email });
+        const user = {
+          firstName,
+          lastName,
+          gender,
+          lineManager,
+          passportNo,
         };
-        if (user) {
-          req.body.requesterId = user.id;
-          req.requester = requesterObj;
-          return next();
-        }
-        throw new ApiError(404, 'User does not exist');
+        req.body.requesterId = id;
+        req.requester = user;
+        return next();
       }
     } catch (error) {
-      errorResponse(res, { code: error.status || 500, message: error.message });
+      errorResponse(res, { code: error.status || 400, message: error.details[0].context.label });
     }
   }
 
@@ -77,12 +76,12 @@ export default class TripRequestMiddleware {
   }
 
   /**
-       * Middleware method for trip stats request validation
-       * @param {object} req - The request from the endpoint.
-       * @param {object} res - The response returned by the method.
-       * @param {object} next - Call the next operation.
-       * @returns {object} - Returns an object (error or response).
-       */
+  * Middleware method for trip stats request validation
+  * @param {object} req - The request from the endpoint.
+  * @param {object} res - The response returned by the method.
+  * @param {object} next - Call the next operation.
+  * @returns {object} - Returns an object (error or response).
+  */
   static async tripStatsCheck(req, res, next) {
     try {
       const { start: startDate, end: endDate } = req.query;
@@ -90,6 +89,50 @@ export default class TripRequestMiddleware {
       if (validated) next();
     } catch (error) {
       errorResponse(res, { code: error.status || 500, message: error.message });
+    }
+  }
+
+  /**
+  * Middleware method for trip type validation
+  * @param {object} req - The request from the endpoint.
+  * @param {object} res - The response returned by the method.
+  * @param {object} next - Call the next operation.
+  * @returns {object} - Returns an object (error or response).
+  */
+  static tripTypeChecker(req, res, next) {
+    const { tripType, tripDetails } = req.body;
+    const { returnDate } = tripDetails[0];
+    const details = tripDetails.length;
+    try {
+      switch (tripType) {
+        case 'One-way': {
+          const msg1 = 'You can only have 1 origin and 1 destination for a one-way trip';
+          const msg2 = 'A one-way trip should have no return date';
+          tripTypeValidator(details, returnDate, msg1, msg2, next);
+          break;
+        }
+
+        case 'Round-Trip': {
+          const msg1 = 'You can only have 1 origin and 1 destination for a Return-trip';
+          const msg2 = 'A return trip must have a return date';
+          tripTypeValidator(details, !returnDate, msg1, msg2, next);
+          break;
+        }
+
+        case 'Multi-leg':
+          if (details < 2 || details > 5) {
+            throw new ApiError(400, 'A Multi-city trip must have a mininmum of 2 and a maximum of 5 trip details');
+          }
+          if (returnDate) {
+            throw new ApiError(400, 'A Multi-city trip should have no return date');
+          }
+          return next();
+
+        default:
+          return next();
+      }
+    } catch (error) {
+      errorResponse(res, { code: 400, message: error.message });
     }
   }
 }

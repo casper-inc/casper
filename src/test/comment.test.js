@@ -8,7 +8,7 @@ import { Helpers } from '../utils';
 import { AuthController, CommentController } from '../controllers';
 import { CommentService } from '../services';
 import {
-  commentData, newCompanyUser, newRequest, newCompany, mockResponse
+  commentData, newCompanyUser, tripRequest, newCompany, mockResponse
 } from './dummies';
 
 const { generateToken } = Helpers;
@@ -30,7 +30,7 @@ describe('Comment route endpoints', () => {
     };
     const { data } = await userSignup(userReq, mockResponse);
     user = data;
-    const requestData = { ...newRequest, requesterId: user.id, managerId: admin.id };
+    const requestData = { ...tripRequest, requesterId: user.id, managerId: admin.id };
     const { dataValues: { id } } = await Request.create(requestData);
     commentObj = { ...commentData, requestId: id };
     wrongUserToken = generateToken({ id: 100 });

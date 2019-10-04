@@ -5,7 +5,7 @@ import RoomService from './roomService';
 import FacilityService from './facilityService';
 
 const {
-  Request, Status, User, AccommodationBooking
+  Request, Status, User, AccommodationBooking, TripDetail, sequelize
 } = db;
 
 const { findRoom } = RoomService;
@@ -34,8 +34,16 @@ export default class RequestService {
     * @memberof RequestService
     */
   static async createTripRequest(tripreq) {
-    const { dataValues: newTripRequest } = await Request.create(tripreq);
-    return newTripRequest;
+    try {
+      const result = await sequelize.transaction(async () => {
+        const options = { include: [{ model: TripDetail, as: 'tripDetails' }] };
+        const { dataValues: newTripRequest } = await Request.create(tripreq, options);
+        return newTripRequest;
+      });
+      return result;
+    } catch (error) {
+      throw new ApiError(500, 'Failed to create request. Try again');
+    }
   }
 
   /**
@@ -82,7 +90,6 @@ export default class RequestService {
     return rooms;
   }
 
-
   /**
     * Get Facility associated with reoom
     * @param {array} roomArray - an array of booked rooms
@@ -108,6 +115,11 @@ export default class RequestService {
   static async getRequests(id) {
     return Request.findAll({
       include: [{
+        model: TripDetail,
+        as: 'tripDetails',
+        attributes: ['origin', 'destination', 'departureDate', 'returnDate']
+      },
+      {
         model: Status,
         as: 'status',
         attributes: ['label']
@@ -131,6 +143,11 @@ export default class RequestService {
   static async getRequest(id, statusId) {
     const requests = await Request.findOne({
       include: [
+        {
+          model: TripDetail,
+          as: 'tripDetails',
+          attributes: ['origin', 'destination', 'departureDate', 'returnDate']
+        },
         {
           model: User,
           as: 'requester',
