@@ -4,63 +4,66 @@ import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import server from '..';
 import {
-  newCompanyUser, createCompanyFacility, newTestCompany, tripRequest, multiLegTrip, badTripRequest
+  newCompanyUser, createCompanyFacility, tripRequest, multiLegTrip, badTripRequest
 } from './dummies';
 import { AuthController, RequestController } from '../controllers';
 import { RequestService } from '../services';
 import db from '../models';
 
 const { Request } = db;
-
 const { companySignUp, userSignup } = AuthController;
 
 chai.use(chaiHttp);
 chai.use(sinonChai);
 
 let newlyCreatedCompany;
-let newlyCreatedUser;
 let newlyCreatedRequest;
 let companyAdminToken;
+let adminId;
 let userToken;
+let userId;
+let companyAdminResponse;
 
 const [companyAdmin] = createCompanyFacility;
 const [noOriginTrip, noDestinationTrip, noDepartureDateTrip] = badTripRequest;
 
-describe('Requester and Manager Route Endpoints', () => {
-  it('should signup a company and return status 201', async () => {
-    const response = await chai.request(server).post('/api/auth/signup/company').send(newTestCompany);
-    newlyCreatedCompany = response.body.data;
-    companyAdminToken = newlyCreatedCompany.admin.token;
-    expect(response).to.have.status(201);
-    expect(response.body.status).to.equal('success');
-    expect(response.body.data).to.be.a('object');
-  });
+before(async () => {
+  const reqCompany = { body: { ...companyAdmin, email: 'baystef@slack.com', companyName: 'paystack' } };
 
+  const res = {
+    status() {
+      return this;
+    },
+    cookie() {
+      return this;
+    },
+    json(obj) {
+      return obj;
+    }
+  };
 
-  it('should signup user successfully with a status of 201', async () => {
-    const user = {
-      email: 'bolamark@user.com',
-      firstName: 'bola',
-      lastName: 'Mark',
-      password: 'tmobnvarq.ss66u',
-      companyName: newlyCreatedCompany.company.companyName,
-      signupToken: newlyCreatedCompany.signupToken,
-    };
-    const response = await chai
-      .request(server)
-      .post('/api/auth/signup/user')
-      .send(user);
-    expect(response).to.have.status(201);
-    expect(response.body.data).to.be.a('object');
-    newlyCreatedUser = response.body.data;
-    userToken = newlyCreatedUser.token;
-  });
+  companyAdminResponse = await companySignUp(reqCompany, res);
+  const { data: { signupToken, admin } } = companyAdminResponse;
+  const reqUser = {
+    body: {
+      ...newCompanyUser, email: 'steve@google.com', signupToken, roleId: 5
+    }
+  };
+  const companyUserResponse = await userSignup(reqUser, res);
+  companyAdminToken = admin.token;
+  userToken = companyUserResponse.data.token;
+  userId = companyUserResponse.data.id;
+  adminId = admin.id;
 });
+afterEach(() => {
+  sinon.restore();
+});
+
 
 describe('Request Endpoints', () => {
   it('should create request successfully with a status of 201', async () => {
-    const response = await Request.create({ ...tripRequest, requesterId: userId, managerId: adminId });
-    newlyCreatedRequest = response.dataValues;
+    const { dataValues } = await Request.create({ ...tripRequest, requesterId: userId, managerId: adminId });
+    newlyCreatedRequest = dataValues;
   });
   it('MANAGER should get request by id in token and param status', async () => {
     const response = await chai
@@ -177,13 +180,7 @@ describe('Request Endpoints', () => {
 });
 
 describe('Request route endpoints', () => {
-  let anotherUserToken;
-  let userId;
-  let companyAdminResponse;
-  let adminId;
   before(async () => {
-    const reqCompany = { body: { ...companyAdmin, email: 'baystef@slack.com', companyName: 'paystack' } };
-
     const res = {
       status() {
         return this;
@@ -196,15 +193,14 @@ describe('Request route endpoints', () => {
       }
     };
 
-    companyAdminResponse = await companySignUp(reqCompany, res);
     const { data: { signupToken, admin } } = companyAdminResponse;
     const reqUser = {
       body: {
-        ...newCompanyUser, email: 'steve@google.com', signupToken, roleId: 5
+        ...newCompanyUser, email: 'bayo@google.com', signupToken, roleId: 5
       }
     };
     const companyUserResponse = await userSignup(reqUser, res);
-    anotherUserToken = companyUserResponse.data.token;
+    userToken = companyUserResponse.data.token;
     userId = companyUserResponse.data.id;
     adminId = admin.id;
   });
@@ -214,7 +210,7 @@ describe('Request route endpoints', () => {
 
   describe('GET api/users/requests', () => {
     it('should return 404 for user with no request yet', async () => {
-      const response = await chai.request(server).get('/api/users/requests').set('Cookie', `token=${anotherUserToken}`);
+      const response = await chai.request(server).get('/api/users/requests').set('Cookie', `token=${userToken}`);
       expect(response).to.have.status(404);
       expect(response.body.error.message).to.be.eql('You have made no request yet');
     });
@@ -242,14 +238,10 @@ describe('Request route endpoints', () => {
   });
 
   describe('Trip Request Endpoint', () => {
-    let newlyRequest;
-    before(async () => {
-      newlyRequest = { ...tripRequest, managerId: newlyCreatedCompany.admin.id };
-    });
     it('should successfully create a one-way trip request', async () => {
       const response = await chai
-        .request(server).post('/api/trip/request').set('Cookie', `token=${anotherUserToken};`)
-        .send({ ...newlyRequest, managerId: adminId });
+        .request(server).post('/api/trip/request').set('Cookie', `token=${userToken};`)
+        .send({ ...tripRequest, managerId: adminId });
       expect(response).to.have.status(201);
       expect(response.body.data).to.include({
         purpose: 'Official',
@@ -288,7 +280,7 @@ describe('Request route endpoints', () => {
       expect(response.body.error).to.be.a('object');
       expect(response.body.error.message).to.equal('Please add a short and valid purpose');
     });
-    it('should return validation error purpose is less than 3 characters', async () => {
+    it('should return validation error if purpose is less than 3 characters', async () => {
       const response = await chai
         .request(server).post('/api/trip/request').set('Cookie', `token=${userToken};`)
         .send({ ...tripRequest, purpose: 'a' });
@@ -297,7 +289,7 @@ describe('Request route endpoints', () => {
       expect(response.body.error.message).to.equal('Please add a short and valid purpose');
     });
 
-    it('should return validation error origin is empty', async () => {
+    it('should return validation error if origin is empty', async () => {
       const response = await chai
         .request(server).post('/api/trip/request').set('Cookie', `token=${userToken};`)
         .send(noOriginTrip);
@@ -305,7 +297,7 @@ describe('Request route endpoints', () => {
       expect(response.body.error).to.be.a('object');
       expect(response.body.error.message).to.equal('Please enter a valid origin');
     });
-    it('should return validation error destination is empty', async () => {
+    it('should return validation error if destination is empty', async () => {
       const response = await chai
         .request(server).post('/api/trip/request').set('Cookie', `token=${userToken};`)
         .send(noDestinationTrip);
@@ -313,7 +305,7 @@ describe('Request route endpoints', () => {
       expect(response.body.error).to.be.a('object');
       expect(response.body.error.message).to.equal('Please enter a valid destination');
     });
-    it('should return validation error departureDate is empty', async () => {
+    it('should return validation error if departureDate is empty', async () => {
       const response = await chai
         .request(server).post('/api/trip/request').set('Cookie', `token=${userToken};`)
         .send(noDepartureDateTrip);
