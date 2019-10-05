@@ -85,8 +85,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'requestId',
       as: 'tripDetails',
       onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-      timestamps: false
+      onDelete: 'CASCADE'
     });
   };
   return Request;

@@ -27,8 +27,6 @@ const [companyAdmin] = createCompanyFacility;
 const [noOriginTrip, noDestinationTrip, noDepartureDateTrip] = badTripRequest;
 
 describe('Requester and Manager Route Endpoints', () => {
-before
-
   it('should signup a company and return status 201', async () => {
     const response = await chai.request(server).post('/api/auth/signup/company').send(newTestCompany);
     newlyCreatedCompany = response.body.data;
