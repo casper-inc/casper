@@ -1,5 +1,7 @@
-import { RequestService } from '../services';
-import { Helpers, ApiError } from '../utils';
+import { RequestService, UserService } from '../services';
+import {
+  Helpers, Mailer, Notification, ApiError
+} from '../utils';
 
 const {
   getRequests, getRequest, updateAnyRequest,
@@ -7,6 +9,8 @@ const {
 } = RequestService;
 
 const { successResponse, errorResponse } = Helpers;
+const { find } = UserService;
+const { sendMail } = Mailer;
 
 /**
  * A collection of methods that controls user requests.
@@ -64,10 +68,28 @@ export default class RequestController {
    */
   static async oneWayTripRequest(req, res) {
     try {
-      const { body } = req;
+      const { body, data: { id } } = req;
       const { requester } = req;
-      delete body.returnDate;
       const oneWayTrip = await createTripRequest({ ...body });
+      delete body.returnDate;
+      const { managerId } = oneWayTrip;
+      const manager = await find({ id: managerId });
+      const user = await find({ id });
+      const {
+        emailNotify, email, firstName
+      } = manager;
+      const staffName = `${user.firstName} ${user.lastName}`;
+      const dashboardLink = `${req.protocol}s://${req.get('host')}/api/users/${managerId.id}`;
+      if (emailNotify) {
+        await sendMail({
+          email, emailTemplateId: 'd-4fa2b9e8173d4e4ba6b3d5f5e4c14308', firstName, urlLink: dashboardLink, staffName
+        });
+      }
+      const notificationData = {
+        message: `${staffName} created a new travel request`,
+        url: 'https://casper.com/users/trip/3'
+      };
+      await Notification.notify(notificationData, [manager]);
       return successResponse(res, { ...oneWayTrip, ...requester }, 201);
     } catch (error) {
       errorResponse(res, {});

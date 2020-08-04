@@ -130,3 +130,27 @@ describe('POST /users/request/stats', () => {
     expect(error.message).to.be.a('string');
   });
 });
+describe('PATCH REQUESTS', () => {
+  it('should return 200 for successfully updating email notification status', async () => {
+    const { id } = newlyCreatedUser;
+    const user = {
+      emailNotify: false,
+    };
+    const response = await chai.request(server).patch(`/api/users/${id}/notification`).send(user)
+      .set('authorization', `Bearer ${token}`);
+    const { body: { status } } = response;
+    expect(response).to.have.status(200);
+    expect(status).to.equal('success');
+  });
+  it('should throw 500 error for failed email notification status update', async () => {
+    const { id } = newlyCreatedUser;
+    const user = {
+      emailNotify: '',
+    };
+    const response = await chai.request(server).patch(`/api/users/${id}/notification`).send(user)
+      .set('authorization', `Bearer ${token}`);
+    const { body: { status } } = response;
+    expect(response).to.have.status(500);
+    expect(status).to.equal('fail');
+  });
+});

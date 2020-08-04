@@ -9,10 +9,10 @@ import {
 const {
   generateToken, verifyToken, successResponse, errorResponse, extractUserData,
   comparePassword, splitCompanyData, splitSupplierData,
-  hashPassword, generateTokenOnSignup,
+  hashPassword, generateTokenOnSignup, generateVerificationLink
 } = Helpers;
 const { createCompany, updateCompanyById } = CompanyService;
-const { sendVerificationEmail, sendResetMail, sendWelcomeEmail } = Mailer;
+const { sendMail } = Mailer;
 
 const {
   create, updateById, updatePassword, find, socialLogin,
@@ -45,7 +45,13 @@ class AuthController {
       const roleAssignment = await assignRole(user.id, defaultRoleId);
       user.token = generateToken({ email: user.email, id: user.id, role: user.role });
       user = extractUserData(user);
-      const isSent = await sendVerificationEmail(req, { ...user });
+      const { email, role, firstName } = user;
+      const verificationLink = generateVerificationLink(req, {
+        email, role
+      });
+      const isSent = await sendMail({
+        email, emailTemplateId: 'd-598aa2e6e00b4c938278c24eeb62cc17', firstName, urlLink: verificationLink
+      });
       const { token } = user;
       res.cookie('token', token, { maxAge: 86400000, httpOnly: true });
       return successResponse(res, { ...user, emailSent: isSent, roleAssignment }, 201);
@@ -76,7 +82,13 @@ class AuthController {
       const defaultRoleId = 6;
       const roleAssignment = await assignRole(user.id, defaultRoleId);
       user = extractUserData(user);
-      const emailSent = await sendWelcomeEmail(req, { ...user, unhashedCompanyToken });
+      const { email, role, firstName } = user;
+      const verificationLink = generateVerificationLink(req, {
+        email, role
+      });
+      const emailSent = await sendMail({
+        email, emailTemplateId: 'd-0e0b3c582ec04e7fb6cff2bd12b9b0ba', firstName, urlLink: verificationLink, companyToken: unhashedCompanyToken
+      });
       res.cookie('token', user.token, { maxAge: 86400000, httpOnly: true });
       return successResponse(res, {
         user, supplier, emailSent, signupToken: unhashedCompanyToken, roleAssignment
@@ -107,7 +119,13 @@ class AuthController {
       const defaultRoleId = 1;
       const roleAssignment = await assignRole(user.id, defaultRoleId);
       const admin = extractUserData(user);
-      const emailSent = await sendWelcomeEmail(req, { companyToken, ...admin });
+      const { email, role, firstName } = user;
+      const verificationLink = generateVerificationLink(req, {
+        id, email, role
+      });
+      const emailSent = await sendMail({
+        email, emailTemplateId: 'd-0e0b3c582ec04e7fb6cff2bd12b9b0ba', firstName, urlLink: verificationLink, companyToken
+      });
       delete company.companyToken;
       res.cookie('token', user.token, { maxAge: 86400000, httpOnly: true });
       return successResponse(res, {
@@ -163,15 +181,11 @@ class AuthController {
       }
       const { firstName, id } = user;
       const token = generateToken({ firstName, id, email }, '24h');
-      const url = `${req.protocol}://${req.get('host')}/api/auth/reset-password?token=${token}`;
-      const response = await sendResetMail({
-        email, firstName, resetPasswordLink: url
+      const resetUrl = `${req.protocol}s://${req.get('host')}/api/auth/reset-password?token=${token}`;
+      const response = await sendMail({
+        email, emailTemplateId: 'd-a47cbbf0e90e469b92dc5329a0659b32', firstName, urlLink: resetUrl
       });
-      if (response === true) {
-        successResponse(res, 'Password reset link sent successfully', 200);
-      } else {
-        throw new ApiError(404, response);
-      }
+      if (response) return successResponse(res, 'Password reset link sent successfully', 200);
     } catch (err) {
       const status = err.status || 500;
       errorResponse(res, { code: status, message: err.message });

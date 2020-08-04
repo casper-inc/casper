@@ -54,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
+      emailNotify: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+      },
       password: { type: DataTypes.STRING, allowNull: true },
       isVerified: {
         type: DataTypes.BOOLEAN,
