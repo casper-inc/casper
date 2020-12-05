@@ -269,7 +269,8 @@ describe('Request route endpoints', () => {
         purpose: 'Official',
         origin: 'Abuja',
         destination: 'Lagos',
-        departureDate: '2020-11-07T00:00:00.000Z'
+        departureDate: '2020-11-07T00:00:00.000Z',
+        rememberUserData: true
       });
     });
 
