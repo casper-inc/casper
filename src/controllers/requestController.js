@@ -55,20 +55,18 @@ export default class RequestController {
   }
 
   /**
-   *  creates a one way trip request
-   * @static
-   * @param {Request} req - The request from the endpoint.
-   * @param {Response} res - The response returned by the method.
-   * @returns { JSON } - A JSON object containing success or failure details.
-   * @memberof RequestController
-   */
-  static async oneWayTripRequest(req, res) {
+   *  creates a trip request
+  * @static
+  * @param {Request} req - The request from the endpoint.
+  * @param {Response} res - The response returned by the method.
+  * @returns { JSON } - A JSON object containing success or failure details.
+  * @memberof RequestController
+  */
+  static async tripRequest(req, res) {
     try {
-      const { body } = req;
-      const { requester } = req;
-      delete body.returnDate;
-      const oneWayTrip = await createTripRequest({ ...body });
-      return successResponse(res, { ...oneWayTrip, ...requester }, 201);
+      const { body, requester } = req;
+      const trip = await createTripRequest(body);
+      return successResponse(res, { ...trip, ...requester }, 201);
     } catch (error) {
       errorResponse(res, {});
     }

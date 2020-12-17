@@ -112,22 +112,76 @@ export const newTestCompany = {
   companyPlanId: 1,
   companySizeId: 2,
 };
-export const newRequest = {
-  purpose: 'Business Meeting',
-  rememberMe: true,
-  tripType: 'One-way',
-  origin: 'Lagos',
-  destination: 'Abuja',
-  departureDate: '2019-11-07',
-  returnDate: '2019-11-21',
-};
+
 export const tripRequest = {
+  managerId: 1,
   purpose: 'Official',
   tripType: 'One-way',
-  origin: 'Abuja',
-  destination: 'Lagos',
-  departureDate: '2020-11-07',
+  extraInfo: 'This is a brand new field on the DB',
+  tripDetails: [{
+    origin: 'Abuja',
+    destination: 'Lagos',
+    departureDate: '2020-11-07'
+  }
+  ]
 };
+
+export const multiLegTrip = {
+  managerId: 1,
+  purpose: 'Official',
+  tripType: 'Multi-leg',
+  extraInfo: 'This is a brand new field on the DB',
+  tripDetails: [{
+    origin: 'Abuja',
+    destination: 'Lagos',
+    departureDate: '2020-11-07'
+  },
+  {
+    origin: 'Lagos',
+    destination: 'Ekiti',
+    departureDate: '2020-12-07'
+  },
+  ]
+};
+
+export const badTripRequest = [
+  {
+    managerId: 1,
+    purpose: 'Official',
+    tripType: 'One-way',
+    extraInfo: 'This is a brand new field on the DB',
+    tripDetails: [{
+      origin: '',
+      destination: 'Lagos',
+      departureDate: '2020-11-07'
+    }
+    ]
+  },
+  {
+    managerId: 1,
+    purpose: 'Official',
+    tripType: 'One-way',
+    extraInfo: 'This is a brand new field on the DB',
+    tripDetails: [{
+      origin: 'Ibadan',
+      destination: '',
+      departureDate: '2020-11-07'
+    }
+    ]
+  },
+  {
+    managerId: 1,
+    purpose: 'Official',
+    tripType: 'One-way',
+    extraInfo: 'This is a brand new field on the DB',
+    tripDetails: [{
+      origin: 'Ibadan',
+      destination: 'Lagos',
+      departureDate: ''
+    }
+    ]
+  },
+];
 
 export const commentData = {
   message: 'I am thinking the trip may not be neccessary as the CEO would need you to get him some pounded yam over the weekend'

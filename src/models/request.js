@@ -45,20 +45,8 @@ module.exports = (sequelize, DataTypes) => {
       values: ['One-way', 'Round-Trip', 'Multi-leg'],
       allowNull: false
     },
-    origin: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    destination: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    departureDate: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    returnDate: {
-      type: DataTypes.DATE,
+    extraInfo: {
+      type: DataTypes.TEXT,
       allowNull: true
     }
   }, {});
@@ -90,6 +78,12 @@ module.exports = (sequelize, DataTypes) => {
     Request.hasMany(models.Comment, {
       as: 'comments',
       foreignKey: 'requestId',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    });
+    Request.hasMany(models.TripDetail, {
+      foreignKey: 'requestId',
+      as: 'tripDetails',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE'
     });

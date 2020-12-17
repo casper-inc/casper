@@ -294,6 +294,27 @@ class Helpers {
       return newItem;
     });
   }
+
+  /**
+   * Checks if a selected trip type has the appropriate details.
+   * @static
+   * @param {number} details - Length of the trip details array.
+   * @param {date} returnDate - A date object that requires .
+   * @param {string} message1 - An error message
+   * @param {string} message2 - An error message
+   * @param {function} next - Call the next operation.
+   * @returns {Promise<Array>} A promise object with an updated collection.
+   * @memberof Helpers
+   */
+  static tripTypeValidator(details, returnDate, message1, message2, next) {
+    if (details > 1) {
+      throw new ApiError(400, message1);
+    }
+    if (returnDate) {
+      throw new ApiError(400, message2);
+    }
+    return next();
+  }
 }
 
 export default Helpers;

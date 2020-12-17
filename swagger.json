@@ -872,7 +872,7 @@
                 }
             }
         },
-        "/facility/supplier/{facilityId}/": {
+        "/facility/supplier/{facilityId}": {
             "patch" : {
                 "description": "updates facility amenities",
                 "summary": "Enables a suppliers admin to update amenities",
@@ -931,7 +931,7 @@
         },
         "/trip/request": {
             "post": {
-                "description": "Creates a one-way trip request",
+                "description": "Creates a One-way trip request",
                 "summary": "Allows user to create a one-way trip request",
                 "tags": [
                     "Requests"
@@ -948,6 +948,41 @@
                         "description": "This is the request body object containing trip request",
                         "schema": {
                             "$ref": "#/requestBody/tripRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "one-way trip request created successfully"
+                    },
+                    "400": {
+                        "description": "Please fill in the fields"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/trip/request?multileg": {
+            "post": {
+                "description": "Creates a trip Multi-leg request",
+                "summary": "Allows user to create a Multi-leg trip request",
+                "tags": [
+                    "Requests"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "description": "This is the request body object containing trip request",
+                        "schema": {
+                            "$ref": "#/requestBody/multiLegtripRequest"
                         }
                     }
                 ],
@@ -1342,11 +1377,14 @@
                 "example": {
                     "purpose": "client requests a physical meeting",
                     "rememberMe": "true",
-                    "tripType": "Multi-leg",
-                    "origin": "abujah",
-                    "destination": "kaduna",
-                    "departureDate": "2019-09-12 08:09:07.439-05",
-                    "returnDate": "2019-10-12 08:09:07.439-05"
+                    "tripType": "One-way",
+                    "extraInfo": "This is a brand new field on the DB",
+                    "tripDetails": [{
+                        "origin": "abujah",
+                        "destination": "kaduna",
+                        "departureDate": "2019-09-12 08:09:07.439-05"
+                        }
+                    ]
                 }
             },
             "tripRequest": {
@@ -1355,7 +1393,8 @@
                 "properties": {
                     "tripType": {
                         "description": "Type of trip request",
-                        "type": "string"
+                        "type": "string",
+                        "enum": ["One-way", "Round-Trip", "Multi-leg"]
                     },
                     "purpose": {
                         "description": "Purpose of trip request",
@@ -1373,18 +1412,97 @@
                         "description": "departureDate of trip request",
                         "type": "string"
                     },
+                    "returnDate": {
+                        "description": "returnDate of trip request",
+                        "type": "string"
+                    },
                     "managerId": {
                         "description": "The id of the line manager that would process the trip request",
                         "type": "number"
+                    },
+                    "extraInfo": {
+                        "description": "A field for adding some extra information about the trip",
+                        "type": "string"
+                    },
+                    "tripDetails": {
+                        "description": "A collection of the trip details(origin, destination and dates of a trip)",
+                        "type": "array"
                     }
                 },
                 "example": {
+                    "managerId": 1,
+                    "purpose": "Business Meeting",
                     "tripType": "One-way",
-                    "purpose": "official",
-                    "origin": "Abuja",
-                    "destination": "Lagos",
-                    "departureDate": "2019-11-07",
-                    "managerId": 2
+                    "extraInfo": "This is a brand new field on the DB",
+                    "tripDetails": [{
+                        "origin": "Lagos",
+                        "destination": "Ibadan",
+                        "departureDate": "2019-10-25"
+                    }
+                    ]
+                },
+                "required": [
+                    "tripType, purpose, origin, destination, departureDate, managerId"
+                ]
+            },
+            "multiLegtripRequest": {
+                "title": "Multi-leg Trip Request",
+                "type": "object",
+                "properties": {
+                    "tripType": {
+                        "description": "Type of trip request",
+                        "type": "string",
+                        "enum": ["One-way", "Round-Trip", "Multi-leg"]
+                    },
+                    "purpose": {
+                        "description": "Purpose of trip request",
+                        "type": "string"
+                    },
+                    "origin": {
+                        "description": "Origin of trip request",
+                        "type": "string"
+                    },
+                    "destination": {
+                        "description": "destination of trip request",
+                        "type": "string"
+                    },
+                    "departureDate": {
+                        "description": "departureDate of trip request",
+                        "type": "string"
+                    },
+                    "returnDate": {
+                        "description": "returnDate of trip request",
+                        "type": "string"
+                    },
+                    "managerId": {
+                        "description": "The id of the line manager that would process the trip request",
+                        "type": "number"
+                    },
+                    "extraInfo": {
+                        "description": "A field for adding some extra information about the trip",
+                        "type": "string"
+                    },
+                    "tripDetails": {
+                        "description": "A collection of the trip details(origin, destination and dates of a trip)",
+                        "type": "array"
+                    }
+                },
+                "example": {
+                    "managerId": 1,
+                    "purpose": "Official",
+                    "tripType": "Multi-leg",
+                    "extraInfo": "This is a brand new field on the DB",
+                    "tripDetails": [{
+                      "origin": "Abuja",
+                      "destination": "Lagos",
+                      "departureDate": "2020-11-07"
+                    },
+                    {
+                      "origin": "Lagos",
+                      "destination": "Ekiti",
+                      "departureDate": "2020-12-07"
+                    }
+                    ]
                   },
                 "required": [
                     "tripType, purpose, origin, destination, departureDate, managerId"
@@ -1432,10 +1550,10 @@
                     "lastName": "Akin",
                     "companySizeId": 1,
                     "companyPlanId": 2,
-                    "email": "daylay33@gmail.com",
+                    "email": "caspervoyager9@gmail.com",
                     "companyAddress": "30, Ania Street",
                     "companyName": "casper",
-                    "password": "Elijah38490"
+                    "password": "Elija455h"
                 },
                 "required": [
                     "firstName, lastName, email,password,companySizeId,companyPlanId,companyAddress,companyName"
