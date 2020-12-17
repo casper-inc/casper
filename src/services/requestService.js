@@ -28,6 +28,22 @@ export default class RequestService {
   }
 
   /**
+   * Get requests of user by search field
+   * @param {*} key - search key
+   * @param {*} value - key value
+   * @param {*} id - user id
+   * @returns {Promise<object>} A promise object with searched request
+   * @memberof RequestService
+   */
+  static async searchByKey(key, value, id) {
+    const requests = await Request.findAll({
+      where: { requesterId: id, [key]: value }
+    });
+    if (requests.length === 0) throw new ApiError(404, 'No such request');
+    return requests;
+  }
+
+  /**
     * Allows user to create a trip request
     * @param {object} tripreq - the id of assigned user.
     * @return {Promise<object>} A promise object with trip request detail.
