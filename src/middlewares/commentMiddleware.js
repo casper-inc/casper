@@ -59,7 +59,13 @@ export default class CommentMiddleware {
         manager: { id: managerId },
         requester: { id: requesterId }
       } = request.get({ plain: true });
-      if ([managerId, requesterId].includes(userId)) return next();
+      if ([managerId, requesterId].includes(userId)) {
+        req.notify = managerId === userId
+          ? { userId: requesterId, isManager: true }
+          : { userId: managerId, isManager: false };
+        return next();
+      }
+
       errorResponse(res, { code: 403, message: 'You are an unauthorized author' });
     } catch (err) {
       errorResponse(res, {});

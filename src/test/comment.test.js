@@ -125,7 +125,7 @@ describe('Comment route endpoints', () => {
       expect(response.body.error.message).to.eql('You are an not authorized to delete this comment');
     });
     it('should return a 500 error response if something goes wrong while deleting the comment', async () => {
-      const req = { params: { commentId: 16 } };
+      const req = {};
       const mock = () => {
         const res = {};
         res.status = sinon.stub().returns(res);
@@ -140,7 +140,7 @@ describe('Comment route endpoints', () => {
           errors: undefined
         }
       };
-      sinon.stub(CommentService, 'deleteCommentById').throws();
+      // sinon.stub(CommentService, 'deleteCommentById').throws();
       await CommentController.deleteComment(req, res);
       expect(res.status).to.have.been.calledWith(500);
       expect(res.json).to.have.been.calledWith(errorResponse);
